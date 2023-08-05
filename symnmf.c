@@ -25,9 +25,7 @@ double squared_distance(double *p, double *q, int d)
 double** multiply_matrices(double** mat1, int rows1, int cols1, double** mat2, int cols2) {
     double** result;
     double* result_1d;
-    int i;
-    int j;
-    int l;
+    int i,j,l;
     /*memory allocation for the multiplication matrix*/
     result_1d = calloc(rows1*cols2, sizeof(double));
     if(result_1d == NULL){
@@ -46,9 +44,9 @@ double** multiply_matrices(double** mat1, int rows1, int cols1, double** mat2, i
     }
 
     /*calculation*/
-    for (int i = 0; i < rows1; i++) {
-        for (int j = 0; j < cols2; j++) {
-            for (int l = 0; l < cols1; l++) {
+    for(i = 0; i < rows1; i++) {
+        for(j = 0; j < cols2; j++) {
+            for(l = 0; l < cols1; l++) {
                 result[i][j] += mat1[i][l] * mat2[l][j];
             }
         }
@@ -59,9 +57,7 @@ double** multiply_matrices(double** mat1, int rows1, int cols1, double** mat2, i
 double** mult_by_transpose(double **mat, int rows, int cols){
     double** result;
     double* result_1d;
-    int i;
-    int j;
-    int l;
+    int i,j,l;
     /*memory allocation for the multiplication matrix*/
     result_1d = calloc(rows*rows, sizeof(double));
     if(result_1d == NULL){
@@ -79,9 +75,9 @@ double** mult_by_transpose(double **mat, int rows, int cols){
         result[i] = result_1d+i*rows;
     }
     /*calculation*/
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < rows; j++) {
-            for (int l = 0; l < cols; l++) {
+    for(i = 0; i < rows; i++) {
+        for(j = 0; j < rows; j++) {
+            for(l = 0; l < cols; l++) {
                 result[i][j] += mat[i][l] * mat[j][l];
             }
         }
@@ -211,7 +207,7 @@ double** update_H(double **H, double **W, int k, int num_of_elements){
     }
     for(i=0; i<num_of_elements; i++)
     {
-        matrix[i] = matrix_1d+i*k;
+        new_H[i] = new_H_1d+i*k;
     }
     
     /*new H calculation*/ 
@@ -225,3 +221,13 @@ double** update_H(double **H, double **W, int k, int num_of_elements){
     return new_H;
 } 
 
+int main(int argc, char **argv){
+    int num_of_elements;
+    int
+    if(argc!=3){
+        printf("An Error Has Occurred\n");
+        exit(1);
+    }
+
+    return 0;
+}
