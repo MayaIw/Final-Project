@@ -1,6 +1,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <math.h>
+# include <string.h>
 
 double sum_of_row(double **mat, int row_index, int num_of_rows){
     int j;
@@ -83,6 +84,17 @@ double** mult_by_transpose(double **mat, int rows, int cols){
         }
     }
     return result;
+}
+
+int check_convergence(double **new_H, double **H, int num_of_elements, int k){
+    int i, j;
+    int sum=0;
+    for(i=0; i<num_of_elements; i++){
+        for(j=0; j<k; j++){
+            sum += pow(new_H[i][j]-H[i][j], 2);
+        }
+    }
+    return (sum<0.0001);
 }
 
 double** sym(double **X, int num_of_elements, int d){
@@ -222,12 +234,98 @@ double** update_H(double **H, double **W, int k, int num_of_elements){
 } 
 
 int main(int argc, char **argv){
-    int num_of_elements;
-    int
+    int k;
+    int iter=300; 
+    int num_of_elements=0;
+    int d=1;
+    int is_end_of_line = 0;
+    double *elements_1d;
+    double **elements;
+    FILE *points;
+    double *point;
+    
+    int i, j, l;
+    double n;
+    char c, next_char;
+    int num_rows, num_cols;
+
+    int end = 0;
+
     if(argc!=3){
         printf("An Error Has Occurred\n");
         exit(1);
     }
+    
+    points = fopen(argv[2], "r");
+    if(points==NULL){
+        printf("An Error Has Occurred\n");
+        exit(1);
+    }
+    while ((c = fgetc(points)) != '\n')
+    {
+        if(c==','){
+            d+=1;
+        }
+    }
+    num_of_elements += 1;
+    for (c = getc(points); c != EOF; c = getc(points)){
+        if (c == '\n'){
+            num_of_elements += 1;
+        } 
+    }
+
+    /*memory allocation for all the points in the file*/
+    elements_1d = calloc(num_of_elements*d, sizeof(double));
+    if(elements_1d == NULL){
+        printf("An Error Has Occurred\n");
+        exit(1);
+    }
+    elements = calloc(num_of_elements,sizeof(double *));
+    if(elements == NULL){
+        printf("An Error Has Occurred\n");
+        free(elements_1d);
+        exit(1);
+    }
+    for(i=0; i<num_of_elements; i++)
+    {
+        elements[i] = elements_1d+i*d;
+    } 
+
+    rewind(points);
+
+    /*put all the points in one array*/
+    num_rows = 0;
+    while (num_rows < num_of_elements) {
+        num_cols = 0;
+        while (num_cols < d) {
+            if (fscanf(file, "%lf", &elements[num_rows][num_cols]) == 1) {
+                num_cols++;
+            } else {
+                break;  // Break the inner loop if no more numbers are found
+            }
+            char delimiter = fgetc(points);
+            if (delimiter == ',') {
+                continue; // Read the comma and continue with the next number
+            } else if (delimiter == '\n' || delimiter == EOF) {
+                // End of line or end of file, break the inner loop
+                break;
+            } else {
+                // Invalid delimiter
+                printf("An Error Has Occurred\n");
+                exit(1);
+            }
+        }
+        num_rows++;
+        next_char = fgetc(points);
+        if (fgetc(points) == '\n' || feof(points)) {
+            break;  // Break the outer loop after reading a new line or reaching the end of file
+        }
+        ungetc(next_char, points); // Push back the character for the next iteration
+    }
+
+    fclose(points);
+            
+    
 
     return 0;
 }
