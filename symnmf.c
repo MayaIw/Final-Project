@@ -234,22 +234,18 @@ double** update_H(double **H, double **W, int k, int num_of_elements){
 } 
 
 int main(int argc, char **argv){
-    int k;
-    int iter=300; 
+    /*int k;
+    int iter=300;*/ 
     int num_of_elements=0;
     int d=1;
-    int is_end_of_line = 0;
     double *elements_1d;
     double **elements;
     FILE *points;
-    double *point;
     
-    int i, j, l;
-    double n;
+    int i;
     char c, next_char;
     int num_rows, num_cols;
-
-    int end = 0;
+    char delimiter;
 
     if(argc!=3){
         printf("An Error Has Occurred\n");
@@ -298,19 +294,19 @@ int main(int argc, char **argv){
     while (num_rows < num_of_elements) {
         num_cols = 0;
         while (num_cols < d) {
-            if (fscanf(file, "%lf", &elements[num_rows][num_cols]) == 1) {
+            if (fscanf(points, "%lf", &elements[num_rows][num_cols]) == 1) {
                 num_cols++;
             } else {
-                break;  // Break the inner loop if no more numbers are found
+                break;  /*Break the inner loop if no more numbers are found*/
             }
-            char delimiter = fgetc(points);
+            delimiter = fgetc(points);
             if (delimiter == ',') {
-                continue; // Read the comma and continue with the next number
+                continue; /*Read the comma and continue with the next number*/
             } else if (delimiter == '\n' || delimiter == EOF) {
-                // End of line or end of file, break the inner loop
+                /*End of line or end of file, break the inner loop*/
                 break;
             } else {
-                // Invalid delimiter
+                /*Invalid delimiter*/
                 printf("An Error Has Occurred\n");
                 exit(1);
             }
@@ -318,9 +314,9 @@ int main(int argc, char **argv){
         num_rows++;
         next_char = fgetc(points);
         if (fgetc(points) == '\n' || feof(points)) {
-            break;  // Break the outer loop after reading a new line or reaching the end of file
+            break;  /*Break the outer loop after reading a new line or reaching the end of file*/
         }
-        ungetc(next_char, points); // Push back the character for the next iteration
+        ungetc(next_char, points); /*Push back the character for the next iteration*/
     }
 
     fclose(points);
