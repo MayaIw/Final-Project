@@ -3,10 +3,10 @@
 # include <math.h>
 # include <string.h>
 
-double sum_of_row(double **mat, int row_index, int num_of_rows){
+double sum_of_row(double **mat, int row_index, int num_of_cols){
     int j;
     double sum=0.0;
-    for(j=0; j<num_of_rows; j++){
+    for(j=0; j<num_of_cols; j++){
         sum += mat[row_index][j];
     }
     return sum;
@@ -195,16 +195,55 @@ double** normalized_mat(double **sym_mat, double **dd_mat, int num_of_elements){
     return mult_on_cols;
 }
 
-double** update_H(double **H, double **W, int k, int num_of_elements){
+double** norm(double **X, int num_of_elements, int d){
+    double **sym_mat;
+    double **dd_mat;
+    double **norm_mat;
+    sym_mat= sym(X, num_of_elements, d);
+    dd_mat= diagonal_degree_mat(sym_mat, num_of_elements);
+    norm_mat= normalized_mat(sym_mat, dd_mat, num_of_elements);
+    return norm_mat;
+}
+
+double** update_H(double **H,double **H_alloc, double **W, int k, int num_of_elements){
     double **numerator_mat;
     double **denominator_mat;
-    double **new_H;
-    double *new_H_1d;
     int i, j;
     numerator_mat = multiply_matrices(W,num_of_elements,num_of_elements,H,k);
     denominator_mat = mult_by_transpose(H,num_of_elements,k);
     denominator_mat = multiply_matrices(denominator_mat,num_of_elements,num_of_elements,H,k);
     
+    /*new H calculation*/ 
+    for(i=0; i<num_of_elements; i++){
+        for(j=0; j<k; j++){
+            H_alloc[i][j]= H[i][j]*(0.5+0.5*numerator_mat[i][j]/denominator_mat[i][j]);
+        }
+    }
+    free(numerator_mat);
+    free(denominator_mat);
+    return H_alloc;
+} 
+
+void printClusters(double **clusters, int d,  int k){
+    int i=0;
+    int j=0;
+    for(i=0; i<k; i++){
+        for(j=0; j<d; j++){
+            printf("%.4f", clusters[i][j]);
+            if(j<d-1){
+                printf("%c", ',');
+            }
+        }
+        printf("\n");
+    }
+
+}
+
+double **symnmf(double **H, double **W, int k, int num_of_elements){
+    int iter=300;
+    int i, j, l;
+    double **new_H;
+    double *new_H_1d;
     /*memory allocation for the new H*/
     new_H_1d = calloc(num_of_elements*k, sizeof(double));
     if(new_H_1d == NULL){
@@ -221,31 +260,37 @@ double** update_H(double **H, double **W, int k, int num_of_elements){
     {
         new_H[i] = new_H_1d+i*k;
     }
-    
-    /*new H calculation*/ 
-    for(i=0; i<num_of_elements; i++){
-        for(j=0; j<k; j++){
-            new_H[i][j]= H[i][j]*(0.5+0.5*numerator_mat[i][j]/denominator_mat[i][j]);
+
+    for(i=0; i<iter; i++){
+        new_H = update_H(H, new_H, W, k, num_of_elements);
+        if(check_convergence(new_H, H, num_of_elements, k)){
+            break;
+        }
+        for(j=0; j<num_of_elements; j++){
+            for(l=0; l<k; l++){
+               H[j][l] = new_H[j][l]; 
+            }
         }
     }
-    free(numerator_mat);
-    free(denominator_mat);
-    return new_H;
-} 
+    free(H);
+    return(new_H);
+}
 
-int main(int argc, char **argv){
-    /*int k;
-    int iter=300;*/ 
+int main(int argc, char **argv){ 
     int num_of_elements=0;
     int d=1;
     double *elements_1d;
     double **elements;
     FILE *points;
+    char *goal;
     
     int i;
     char c, next_char;
     int num_rows, num_cols;
     char delimiter;
+    /*double **sym_mat;
+    double **ddg_mat;
+    double **norm_mat;*/
 
     if(argc!=3){
         printf("An Error Has Occurred\n");
@@ -255,6 +300,7 @@ int main(int argc, char **argv){
     points = fopen(argv[2], "r");
     if(points==NULL){
         printf("An Error Has Occurred\n");
+        printf("could not open file\n");
         exit(1);
     }
     while ((c = fgetc(points)) != '\n')
@@ -263,8 +309,8 @@ int main(int argc, char **argv){
             d+=1;
         }
     }
-    num_of_elements += 1;
-    for (c = getc(points); c != EOF; c = getc(points)){
+    num_of_elements += 2; /*go back to fix it*/
+    while ((c = fgetc(points)) != EOF){
         if (c == '\n'){
             num_of_elements += 1;
         } 
@@ -313,15 +359,24 @@ int main(int argc, char **argv){
         }
         num_rows++;
         next_char = fgetc(points);
-        if (fgetc(points) == '\n' || feof(points)) {
+        if (next_char == '\n' || feof(points)) {
             break;  /*Break the outer loop after reading a new line or reaching the end of file*/
         }
-        ungetc(next_char, points); /*Push back the character for the next iteration*/
+        ungetc(next_char, points);
     }
 
     fclose(points);
-            
-    
+
+    goal = argv[1];
+    if(!strcmp(goal, "sym")){
+        printClusters(sym(elements, num_of_elements, d),num_of_elements, num_of_elements);
+    }
+    else if(!strcmp(goal, "ddg")){
+        printClusters(ddg(elements, num_of_elements, d),num_of_elements, num_of_elements);
+    }
+    else if(!strcmp(goal, "norm")){
+        printClusters(norm(elements, num_of_elements, d),num_of_elements, num_of_elements);
+    }
 
     return 0;
 }
