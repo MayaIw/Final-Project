@@ -186,6 +186,7 @@ double** normalized_mat(double **sym_mat, double **dd_mat, int num_of_elements){
     }
 
     mult_on_cols=mult_on_rows;
+    
     for(i=0; i<num_of_elements; i++){
         for(j=0; j<num_of_elements; j++){
             mult_on_cols[j][i]*=mult_mat[i][i];
@@ -224,13 +225,13 @@ double** update_H(double **H,double **H_alloc, double **W, int k, int num_of_ele
     return H_alloc;
 } 
 
-void printClusters(double **clusters, int d,  int k){
+void printMatrix(double **matrix, int num_of_rows,  int num_of_cols){
     int i=0;
     int j=0;
-    for(i=0; i<k; i++){
-        for(j=0; j<d; j++){
-            printf("%.4f", clusters[i][j]);
-            if(j<d-1){
+    for(i=0; i<num_of_rows; i++){
+        for(j=0; j<num_of_cols; j++){
+            printf("%.4f", matrix[i][j]);
+            if(j<num_of_cols-1){
                 printf("%c", ',');
             }
         }
@@ -239,7 +240,7 @@ void printClusters(double **clusters, int d,  int k){
 
 }
 
-double **symnmf(double **H, double **W, int k, int num_of_elements){
+double** symnmf(double **H, double **W, int k, int num_of_elements){
     int iter=300;
     int i, j, l;
     double **new_H;
@@ -288,9 +289,6 @@ int main(int argc, char **argv){
     char c, next_char;
     int num_rows, num_cols;
     char delimiter;
-    /*double **sym_mat;
-    double **ddg_mat;
-    double **norm_mat;*/
 
     if(argc!=3){
         printf("An Error Has Occurred\n");
@@ -303,13 +301,19 @@ int main(int argc, char **argv){
         printf("could not open file\n");
         exit(1);
     }
-    while ((c = fgetc(points)) != '\n')
+
+    while ((c = fgetc(points)) != EOF)
     {
         if(c==','){
             d+=1;
         }
+        if(c=='\n'){
+            num_of_elements += 1;
+            break;
+        }
     }
-    num_of_elements += 2; /*go back to fix it*/
+
+    num_of_elements += 1; /*counting the last line*/
     while ((c = fgetc(points)) != EOF){
         if (c == '\n'){
             num_of_elements += 1;
@@ -369,14 +373,22 @@ int main(int argc, char **argv){
 
     goal = argv[1];
     if(!strcmp(goal, "sym")){
-        printClusters(sym(elements, num_of_elements, d),num_of_elements, num_of_elements);
+        printMatrix(sym(elements, num_of_elements, d),num_of_elements, num_of_elements);
     }
     else if(!strcmp(goal, "ddg")){
-        printClusters(ddg(elements, num_of_elements, d),num_of_elements, num_of_elements);
+        printMatrix(ddg(elements, num_of_elements, d),num_of_elements, num_of_elements);
     }
     else if(!strcmp(goal, "norm")){
-        printClusters(norm(elements, num_of_elements, d),num_of_elements, num_of_elements);
+        printMatrix(norm(elements, num_of_elements, d),num_of_elements, num_of_elements);
+    }
+    else{
+        printf("An Error Has Occurred\n");
+        free(elements_1d);
+        free(elements);
+        exit(1);
     }
 
+    free(elements_1d);
+    free(elements);
     return 0;
 }
