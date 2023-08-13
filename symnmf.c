@@ -3,6 +3,34 @@
 # include <math.h>
 # include <string.h>
 
+double** matrix_allocation(int num_of_rows, int num_of_cols){
+    int i=0;
+    double *matrix_1d;
+    double **matrix;
+    /*memory allocation for the diagonal degree matrix*/
+    matrix_1d = calloc(num_of_rows*num_of_cols, sizeof(double));
+    if(matrix_1d == NULL){
+        printf("An Error Has Occurred\n");
+        exit(1);
+    }
+    matrix = calloc(num_of_rows,sizeof(double *));
+    if(matrix == NULL){
+        printf("An Error Has Occurred\n");
+        free(matrix_1d);
+        exit(1);
+    }
+    for(i=0; i<num_of_rows; i++)
+    {
+        matrix[i] = matrix_1d+i*num_of_cols;
+    } 
+    return matrix;
+}
+
+void free_matrix(double **matrix){
+    free(matrix[0]);
+    free(matrix);
+}
+
 double sum_of_row(double **mat, int row_index, int num_of_cols){
     int j;
     double sum=0.0;
@@ -97,7 +125,7 @@ int check_convergence(double **new_H, double **H, int num_of_elements, int k){
     return (sum<0.0001);
 }
 
-double** sym(double **X, int num_of_elements, int d){
+double** sym_c(double **X, int num_of_elements, int d){
     int i=0;
     int j=0;
     double *matrix_1d;
@@ -159,10 +187,10 @@ double** diagonal_degree_mat(double **sym_mat, int num_of_elements){
     return matrix;
 }
 
-double** ddg(double **X, int num_of_elements, int d){
+double** ddg_c(double **X, int num_of_elements, int d){
     double **sym_mat;
     double **dd_mat;
-    sym_mat=(sym(X, num_of_elements, d));
+    sym_mat=(sym_c(X, num_of_elements, d));
     dd_mat=(diagonal_degree_mat(sym_mat, num_of_elements));
     return dd_mat;
 }
@@ -196,11 +224,11 @@ double** normalized_mat(double **sym_mat, double **dd_mat, int num_of_elements){
     return mult_on_cols;
 }
 
-double** norm(double **X, int num_of_elements, int d){
+double** norm_c(double **X, int num_of_elements, int d){
     double **sym_mat;
     double **dd_mat;
     double **norm_mat;
-    sym_mat= sym(X, num_of_elements, d);
+    sym_mat= sym_c(X, num_of_elements, d);
     dd_mat= diagonal_degree_mat(sym_mat, num_of_elements);
     norm_mat= normalized_mat(sym_mat, dd_mat, num_of_elements);
     return norm_mat;
@@ -220,8 +248,8 @@ double** update_H(double **H,double **H_alloc, double **W, int k, int num_of_ele
             H_alloc[i][j]= H[i][j]*(0.5+0.5*numerator_mat[i][j]/denominator_mat[i][j]);
         }
     }
-    free(numerator_mat);
-    free(denominator_mat);
+    free_matrix(numerator_mat);
+    free_matrix(denominator_mat);
     return H_alloc;
 } 
 
@@ -240,7 +268,7 @@ void printMatrix(double **matrix, int num_of_rows,  int num_of_cols){
 
 }
 
-double** symnmf(double **H, double **W, int k, int num_of_elements){
+double** symnmf_c(double **H, double **W, int k, int num_of_elements){
     int iter=300;
     int i, j, l;
     double **new_H;
@@ -373,13 +401,13 @@ int main(int argc, char **argv){
 
     goal = argv[1];
     if(!strcmp(goal, "sym")){
-        printMatrix(sym(elements, num_of_elements, d),num_of_elements, num_of_elements);
+        printMatrix(sym_c(elements, num_of_elements, d),num_of_elements, num_of_elements);
     }
     else if(!strcmp(goal, "ddg")){
-        printMatrix(ddg(elements, num_of_elements, d),num_of_elements, num_of_elements);
+        printMatrix(ddg_c(elements, num_of_elements, d),num_of_elements, num_of_elements);
     }
     else if(!strcmp(goal, "norm")){
-        printMatrix(norm(elements, num_of_elements, d),num_of_elements, num_of_elements);
+        printMatrix(norm_c(elements, num_of_elements, d),num_of_elements, num_of_elements);
     }
     else{
         printf("An Error Has Occurred\n");
