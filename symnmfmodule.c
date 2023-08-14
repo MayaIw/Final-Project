@@ -1,6 +1,10 @@
-#define PY_SSIZE_T_CLEAN
-#include <Python.h>
-#include "symnmf.h"
+# include <stdio.h>
+# include <stdlib.h>
+# include <math.h>
+# include <string.h>
+# define PY_SSIZE_T_CLEAN
+# include <Python.h>
+# include "symnmf.h"
 
 static PyObject* sym(PyObject *self, PyObject *args){
     PyObject *elements_lst;
@@ -157,6 +161,7 @@ static PyObject* symnmf(PyObject *self, PyObject *args){
     PyObject *H;
     PyObject *W_lst;
     PyObject *W;
+    PyObject *H_float;
     double H_entry;
     double **H_c;
     double W_entry;
@@ -181,7 +186,8 @@ static PyObject* symnmf(PyObject *self, PyObject *args){
     for(i=0; i<num_of_elements; i++){
         H = PyList_GetItem(H_lst, i);
         for(j=0; j<k; j++){
-            H_entry = PyFloat_AsDouble(PyList_GetItem(H, j)); 
+            H_float = PyList_GetItem(H, j);
+            H_entry = PyFloat_AsDouble(H_float); 
             H_c[i][j] = H_entry;
         }
     }
@@ -198,7 +204,6 @@ static PyObject* symnmf(PyObject *self, PyObject *args){
     returned_mat = symnmf_c(H_c, W_c, k, num_of_elements);
 
     free_matrix(W_c);
-    free_matrix(H_c);
 
     PyObject* matrix;
     PyObject* vector;

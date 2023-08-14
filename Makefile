@@ -1,9 +1,9 @@
 # Specify the target executable and the source files needed to build it
-my_app: symnmf.o symnmfmodule.o symnmf.h
-    gcc -o my_app symnmf.o symnmfmodule.o
+my_app: symnmf.o symnmf.h 
+	gcc -o my_app symnmf.o -ansi -Wall -Wextra -Werror -pedantic-errors -lm
 # Specify the object files that are generated from the corresponding source files
-symnmf.o: symnmf.c
-    gcc -ansi -Wall -Wextra -Werror -pedantic-errors symnmf.c -lm
 
-symnmfmodule.o: symnmfmodule.c
-    gcc -c foo.c
+symnmf.o: symnmf.c
+	gcc -c -ansi -Wall -Wextra -Werror -pedantic-errors symnmf.c -lm
+
+

@@ -17,7 +17,7 @@ def calculate_average(W, num_of_elements):
 
 def initialize_H(W, num_of_elements, k):
     average = calculate_average(W, num_of_elements)
-    H = np.random.uniform(low=0, high=2*math.sqrt(average), size=(num_of_elements, k))
+    H = np.random.uniform(low=0.0, high=2*math.sqrt(average), size=(num_of_elements, k))
     return H
 
 def is_float(n):
@@ -49,8 +49,8 @@ def main():
         else:
             print("Invalid number of clusters!")
             exit(0)
-        file_name = str(sys.argv[2])
-        goal = str(sys.argv[3])
+        file_name = str(sys.argv[3])
+        goal = str(sys.argv[2])
     else:
         print("An Error Has Occurred")
         exit(0)
@@ -67,15 +67,15 @@ def main():
         exit(0)
 
     if goal=="sym":
-        printMatrix(mf.sym(elements.tolist(), num_of_elements, d))
+        printMatrix(mf.sym(elements.tolist(), num_of_elements, d), num_of_elements, num_of_elements)
     elif goal=="ddg":
-        printMatrix(mf.ddg(elements.tolist(), num_of_elements, d))
+        printMatrix(mf.ddg(elements.tolist(), num_of_elements, d), num_of_elements, num_of_elements)
     elif goal=="norm":
-        printMatrix(mf.norm(elements.tolist(), num_of_elements, d))
+        printMatrix(mf.norm(elements.tolist(), num_of_elements, d), num_of_elements, num_of_elements)
     elif goal=="symnmf":
         W = mf.norm(elements.tolist(), num_of_elements, d)
         H = initialize_H(W, num_of_elements, k)
-        printMatrix(mf.symnmf(H, W, k, num_of_elements))
+        printMatrix(mf.symnmf(H.tolist(), W, k, num_of_elements), num_of_elements, k)
 
 if __name__ == "__main__":
     main()

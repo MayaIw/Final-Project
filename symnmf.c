@@ -193,6 +193,7 @@ double** ddg_c(double **X, int num_of_elements, int d){
     double **dd_mat;
     sym_mat=(sym_c(X, num_of_elements, d));
     dd_mat=(diagonal_degree_mat(sym_mat, num_of_elements));
+    free_matrix(sym_mat);
     return dd_mat;
 }
 
@@ -201,27 +202,17 @@ double** normalized_mat(double **sym_mat, double **dd_mat, int num_of_elements){
     double **mult_on_rows; /*D^-0.5*A*/
     double **mult_on_cols; /*D^-0.5*A*D^-0.5*/
     int i=0;
-    int j=0;
     mult_mat = dd_mat;
-    mult_on_rows = sym_mat;
+    
     for(i=0; i<num_of_elements; i++){
         mult_mat[i][i]= pow(mult_mat[i][i], -0.5);
     }
 
-    for(i=0; i<num_of_elements; i++){
-        for(j=0; j<num_of_elements; j++){
-            mult_on_rows[i][j]*=mult_mat[i][i];
-        }
-    }
-
-    mult_on_cols=mult_on_rows;
+    mult_on_rows = multiply_matrices(mult_mat, num_of_elements, num_of_elements, sym_mat, num_of_elements);
     
-    for(i=0; i<num_of_elements; i++){
-        for(j=0; j<num_of_elements; j++){
-            mult_on_cols[j][i]*=mult_mat[i][i];
-        }
-    }
-
+    mult_on_cols = multiply_matrices(mult_on_rows, num_of_elements, num_of_elements, mult_mat, num_of_elements);
+    
+    free_matrix(mult_on_rows);
     return mult_on_cols;
 }
 
@@ -232,6 +223,8 @@ double** norm_c(double **X, int num_of_elements, int d){
     sym_mat= sym_c(X, num_of_elements, d);
     dd_mat= diagonal_degree_mat(sym_mat, num_of_elements);
     norm_mat= normalized_mat(sym_mat, dd_mat, num_of_elements);
+    free_matrix(dd_mat);
+    free_matrix(sym_mat);
     return norm_mat;
 }
 
@@ -266,7 +259,7 @@ void printMatrix(double **matrix, int num_of_rows,  int num_of_cols){
         }
         printf("\n");
     }
-
+    free_matrix(matrix);
 }
 
 double** symnmf_c(double **H, double **W, int k, int num_of_elements){
@@ -419,5 +412,6 @@ int main(int argc, char **argv){
 
     free(elements_1d);
     free(elements);
+
     return 0;
 }
