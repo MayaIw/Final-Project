@@ -2,6 +2,7 @@
 # include <stdlib.h>
 # include <math.h>
 # include <string.h>
+# include "symnmf.h"
 
 double** matrix_allocation(int num_of_rows, int num_of_cols){
     int i=0;

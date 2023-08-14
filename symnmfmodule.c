@@ -7,7 +7,6 @@ static PyObject* sym(PyObject *self, PyObject *args){
     PyObject *element;
     double element_coord;
     double **elements;
-    PyObject *sym_mat;
     double **returned_mat;
     int i, j;
     int num_of_elements;
@@ -58,7 +57,6 @@ static PyObject* ddg(PyObject *self, PyObject *args){
     PyObject *element;
     double element_coord;
     double **elements;
-    PyObject *ddg_mat;
     double **returned_mat;
     int i, j;
     int num_of_elements;
@@ -109,7 +107,6 @@ static PyObject* norm(PyObject *self, PyObject *args){
     PyObject *element;
     double element_coord;
     double **elements;
-    PyObject *norm_mat;
     double **returned_mat;
     int i, j;
     int num_of_elements;
@@ -164,7 +161,6 @@ static PyObject* symnmf(PyObject *self, PyObject *args){
     double **H_c;
     double W_entry;
     double **W_c;
-    PyObject *sym_mat;
     double **returned_mat;
     int i, j;
     int num_of_elements;
@@ -195,7 +191,7 @@ static PyObject* symnmf(PyObject *self, PyObject *args){
         W = PyList_GetItem(W_lst, i);
         for(j=0; j<k; j++){
             W_entry = PyFloat_AsDouble(PyList_GetItem(W, j)); 
-            W_c[i][j] = H_entry;
+            W_c[i][j] = W_entry;
         }
     }
 
@@ -242,3 +238,20 @@ static PyMethodDef symnmfMethods[] = {
       PyDoc_STR("A geometric series up to n. sum_up_to_n(z^n)")}, /*  The docstring for the function */
     {NULL, NULL, 0, NULL}     /* The last entry must be all NULL */
 };
+
+static struct PyModuleDef symnmfmodule = {
+    PyModuleDef_HEAD_INIT,
+    "mysymnmf", /* name of module */
+    NULL, /* module documentation, may be NULL */
+    -1,  /* size of per-interpreter state of the module, or -1 if the module keeps state in global variables. */
+    symnmfMethods /* the PyMethodDef array from before containing the methods of the extension */
+};
+
+PyMODINIT_FUNC PyInit_mysymnmf(void){
+    PyObject *m;
+    m = PyModule_Create(&symnmfmodule);
+    if (!m) {
+        return NULL;
+    }
+    return m;
+}
