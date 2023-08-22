@@ -91,8 +91,7 @@ static PyObject* ddg(PyObject *self, PyObject *args){
     PyObject* vector;
     PyObject* python_float;
     matrix = PyList_New(num_of_elements);
-    for (int i = 0; i < num_of_elements; i++)
-    {   
+    for (int i = 0; i < num_of_elements; i++){   
         vector = PyList_New(num_of_elements);
         for(j=0; j<num_of_elements; j++){
             python_float = PyFloat_FromDouble(returned_mat[i][j]);
@@ -195,7 +194,7 @@ static PyObject* symnmf(PyObject *self, PyObject *args){
     /*reading W from python and passing into c matrix*/
     for(i=0; i<num_of_elements; i++){
         W = PyList_GetItem(W_lst, i);
-        for(j=0; j<k; j++){
+        for(j=0; j<num_of_elements; j++){
             W_entry = PyFloat_AsDouble(PyList_GetItem(W, j)); 
             W_c[i][j] = W_entry;
         }
@@ -203,6 +202,7 @@ static PyObject* symnmf(PyObject *self, PyObject *args){
 
     returned_mat = symnmf_c(H_c, W_c, k, num_of_elements);
 
+    free_matrix(H_c);
     free_matrix(W_c);
 
     PyObject* matrix;
@@ -228,19 +228,47 @@ static PyMethodDef symnmfMethods[] = {
     {"sym",                   /* the Python method name that will be used */
       (PyCFunction) sym, /* the C-function that implements the Python function and returns static PyObject*  */
       METH_VARARGS,           /* flags indicating parameters accepted for this function */
-      PyDoc_STR("A geometric series up to n. sum_up_to_n(z^n)")}, /*  The docstring for the function */
+      PyDoc_STR("Calculates and outputs the similarity martix from given data points.\n"
+                "The similarity matrix A has num_of_elements rows and num_of_elements columns\n"
+                "a_ij = exp(-0.5*(Euclidean distance(x_i-x_j))^2) if i!=j, or 0 if i=j \n"
+                "expected arguments: \n"
+                "X- A 2D list of d dimentional data points, of type float. Denoted by x_1, x_2,...\n"
+                "num_of_elements- The number of points in X. int.\n"
+                "d- The number of coordinates of each point. int.")}, /*  The docstring for the function */
       {"ddg",                   /* the Python method name that will be used */
       (PyCFunction) ddg, /* the C-function that implements the Python function and returns static PyObject*  */
       METH_VARARGS,           /* flags indicating parameters accepted for this function */
-      PyDoc_STR("A geometric series up to n. sum_up_to_n(z^n)")}, /*  The docstring for the function */
+      PyDoc_STR("Calculates and outputs the diagonal degree martix from given data points.\n"
+                "The diagonal degree martix D has num_of_elements rows and num_of_elements columns\n"
+                "First, it calculates the similariry matrix from the given data points.\n"
+                "d_ii equals to the sum of the i'th row of the similarity matrix, and 0 elsewhwre. \n"
+                "expected arguments: \n"
+                "X- A 2D list of d dimentional data points, of type float. Denoted by x_1, x_2,...\n"
+                "num_of_elements- the number of points in X. int.\n"
+                "d- number of coordinates of each point. int.")}, /*  The docstring for the function */
       {"norm",                   /* the Python method name that will be used */
       (PyCFunction) norm, /* the C-function that implements the Python function and returns static PyObject*  */
       METH_VARARGS,           /* flags indicating parameters accepted for this function */
-      PyDoc_STR("A geometric series up to n. sum_up_to_n(z^n)")}, /*  The docstring for the function */
+      PyDoc_STR("Calculates and outputs the normalized similarity martix W from given data points.\n"
+                "The normalized similarity martix W has num_of_elements rows and num_of_elements columns\n"
+                "First, it calculates the similariry matrix A from the given data points.\n"
+                "Second, it calculates the diagonal degree martix W from the given data points.\n"
+                "W = D^-0.5*A*D^-0.5\n"
+                "expected arguments: \n"
+                "X- A 2D list of d dimentional data points, of type float. Denoted by x_1, x_2,...\n"
+                "num_of_elements- the number of points in X. int.\n"
+                "d- number of coordinates of each point. int.")}, /*  The docstring for the function */
       {"symnmf",                   /* the Python method name that will be used */
       (PyCFunction) symnmf, /* the C-function that implements the Python function and returns static PyObject*  */
       METH_VARARGS,           /* flags indicating parameters accepted for this function */
-      PyDoc_STR("A geometric series up to n. sum_up_to_n(z^n)")}, /*  The docstring for the function */
+      PyDoc_STR("Performs full the symNMF algorithm and output the final H.\n"
+                "expected arguments: \n"
+                "H- A non-negative matrix of num_of_elements rows by k columns. \n"
+                "H is randomly initialized with values from the interval [0; 2*sqrt(m/k)], \n"
+                "where m is the average of all entries of W. Type float.\n"
+                "W- The normalized similarity matrix. Created from num_of_elements data points. Type float.\n"
+                "k- the number of required clusters. int.\n"
+                "num_of_elements- the number of data points that were used to create W. int.\n")}, /*  The docstring for the function */
     {NULL, NULL, 0, NULL}     /* The last entry must be all NULL */
 };
 

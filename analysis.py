@@ -8,6 +8,8 @@ import numpy as np
 import pandas as pd
 import mysymnmf as mf
 
+np.random.seed(0)
+
 #p1, p2 are arrays with float values, representing d dimentional points
 #the function calculates the euclidean distance between p1 and p2
 def distance(p1, p2, d):
@@ -57,10 +59,11 @@ def is_float(n):
     except:
         return False
     
-def symnmfClusterAssign(matrix, num_of_elements, k):
+def symnmfClusterAssign(matrix, num_of_elements):
     clusters = []
     for i in range(num_of_elements):
-        clusters.append(list.index(matrix[i],max(matrix[i])))
+        max_i = max(matrix[i])
+        clusters.append(matrix[i].index(max_i))
     return clusters
     
 def kmeans(elements, num_of_elements, k, d):
@@ -108,7 +111,7 @@ def calculate_average(W, num_of_elements):
 
 def initialize_H(W, num_of_elements, k):
     average = calculate_average(W, num_of_elements)
-    H = np.random.uniform(low=0.0, high=2*math.sqrt(average), size=(num_of_elements, k))
+    H = np.random.uniform(low=0.0, high=2*math.sqrt(average/k), size=(num_of_elements, k))
     return H
 
 def main():
@@ -137,18 +140,16 @@ def main():
         exit(0)
 
     kmeans_clusters = kmeans(elements, num_of_elements, k, d)
-    print("assigned kmeans clusters")
     kmeans_silhouette = metrics.silhouette_score(elements, kmeans_clusters)
 
     W = mf.norm(elements.tolist(), num_of_elements, d)
     H = initialize_H(W, num_of_elements, k)
     new_H = mf.symnmf(H.tolist(), W, k, num_of_elements)
-    symnmf_clusters = symnmfClusterAssign(new_H, num_of_elements, k)
-    print("assigned symnmf clusters")
+    symnmf_clusters = symnmfClusterAssign(new_H, num_of_elements)
     symnmf_silhouette = metrics.silhouette_score(elements, symnmf_clusters)
 
-    print("nmf: " + str(symnmf_silhouette))
-    print("kmeans: " + str(kmeans_silhouette))
+    print("nmf: %.4f" % symnmf_silhouette)
+    print("kmeans: %.4f"  % kmeans_silhouette)
 
 if __name__ == "__main__":
     main()
