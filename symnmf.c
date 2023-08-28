@@ -263,7 +263,7 @@ int main(int argc, char **argv){
         exit(1);
     }
 
-    /*reading the first line, and counting the number of coordinates of a datapoint.*/
+    /*reading the first line, and counting the number of coordinates of a datapoint*/
     while ((c = fgetc(points)) != EOF)
     {
         if(c==','){
@@ -275,9 +275,7 @@ int main(int argc, char **argv){
         }
     }
 
-    num_of_elements += 1; /*counting the last line if there is no '\n' character at the end*/
-
-    /*reading the rest pf the file, and counting the number of datapoints.*/
+    /*reading the rest pf the file, and counting the number of datapoints*/
     while ((c = fgetc(points)) != EOF){
         if (c == '\n'){
             num_of_elements += 1;
@@ -303,7 +301,7 @@ int main(int argc, char **argv){
             delimiter = fgetc(points);
             if (delimiter == ',') {
                 continue; 
-            } else if (delimiter == '\n' || delimiter == EOF) {
+            } else if (delimiter == '\n') {
                 break;
             } else { /*Invalid delimiter*/
                 printf("An Error Has Occurred\n");
@@ -313,7 +311,7 @@ int main(int argc, char **argv){
         }
         num_rows++;
         next_char = fgetc(points);
-        if (next_char == '\n' || feof(points)) {
+        if (next_char == '\n') {
             break;  
         }
         ungetc(next_char, points);

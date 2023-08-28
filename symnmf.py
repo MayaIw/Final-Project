@@ -27,10 +27,10 @@ def is_float(n):
     except:
         return False
     
-def printMatrix(clusters, num_of_rows, num_of_cols):
+def printMatrix(matrix, num_of_rows, num_of_cols):
     for i in range(num_of_rows):
         for j in range(num_of_cols):
-            print('%.4f' % clusters[i][j], end='')
+            print('%.4f' % matrix[i][j], end='')
             if j<num_of_cols-1:
                 print(",", end='')
         print('')
@@ -75,8 +75,8 @@ def main():
     elif goal=="symnmf":
         W = mf.norm(elements.tolist(), num_of_elements, d)
         H = initialize_H(W, num_of_elements, k)
-        print("H is:")
         printMatrix(H, num_of_elements, k)
+        print("")
         printMatrix(mf.symnmf(H.tolist(), W, k, num_of_elements), num_of_elements, k)
     else:
         print("An Error Has Occurred")

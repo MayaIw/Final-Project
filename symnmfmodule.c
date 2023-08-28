@@ -240,7 +240,6 @@ static PyMethodDef symnmfMethods[] = {
       METH_VARARGS,           /* flags indicating parameters accepted for this function */
       PyDoc_STR("Calculates and outputs the diagonal degree martix from given data points.\n"
                 "The diagonal degree martix D has num_of_elements rows and num_of_elements columns\n"
-                "First, it calculates the similariry matrix from the given data points.\n"
                 "d_ii equals to the sum of the i'th row of the similarity matrix, and 0 elsewhwre. \n"
                 "expected arguments: \n"
                 "X- A 2D list of d dimentional data points, of type float. Denoted by x_1, x_2,...\n"
@@ -251,9 +250,7 @@ static PyMethodDef symnmfMethods[] = {
       METH_VARARGS,           /* flags indicating parameters accepted for this function */
       PyDoc_STR("Calculates and outputs the normalized similarity martix W from given data points.\n"
                 "The normalized similarity martix W has num_of_elements rows and num_of_elements columns\n"
-                "First, it calculates the similariry matrix A from the given data points.\n"
-                "Second, it calculates the diagonal degree martix W from the given data points.\n"
-                "W = D^-0.5*A*D^-0.5\n"
+                "W = D^-0.5*A*D^-0.5 where D is the diagonal degree martix, and A is the similariry matrix.\n"
                 "expected arguments: \n"
                 "X- A 2D list of d dimentional data points, of type float. Denoted by x_1, x_2,...\n"
                 "num_of_elements- the number of points in X. int.\n"
@@ -262,6 +259,7 @@ static PyMethodDef symnmfMethods[] = {
       (PyCFunction) symnmf, /* the C-function that implements the Python function and returns static PyObject*  */
       METH_VARARGS,           /* flags indicating parameters accepted for this function */
       PyDoc_STR("Performs full the symNMF algorithm and output the final H.\n"
+                "The output matrix H has num_of_elements rows and k columns.\n"
                 "expected arguments: \n"
                 "H- A non-negative matrix of num_of_elements rows by k columns. \n"
                 "H is randomly initialized with values from the interval [0; 2*sqrt(m/k)], \n"

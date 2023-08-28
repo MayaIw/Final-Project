@@ -1,6 +1,5 @@
-import sklearn as sk
 from sklearn import metrics
-from sklearn import cluster
+from symnmf import *
 import math
 import sys
 import copy
@@ -42,29 +41,6 @@ def centriodUpdate(clusters, size_of_clusters, k: int, d: int):
                 exit(0)
             clusters[i][j] =  clusters[i][j]/size_of_clusters[i]
     return
-
-def printClusters(clusters, d, k):
-    for i in range(k):
-        for j in range(d):
-            print('%.4f' % clusters[i][j], end='')
-            if j<d-1:
-                print(",", end='')
-        print('')
-    return
-
-def is_float(n):
-    try:
-        float(n)
-        return True
-    except:
-        return False
-    
-def symnmfClusterAssign(matrix, num_of_elements):
-    clusters = []
-    for i in range(num_of_elements):
-        max_i = max(matrix[i])
-        clusters.append(matrix[i].index(max_i))
-    return clusters
     
 def kmeans(elements, num_of_elements, k, d):
     centroids = []
@@ -101,18 +77,14 @@ def kmeans(elements, num_of_elements, k, d):
     final_clusters = [clusterAssign(elements[x], centroids, k, d) for x in range(num_of_elements)]
     return final_clusters
 
-def calculate_average(W, num_of_elements):
-    sum = 0.0
+    
+def symnmfClusterAssign(matrix, num_of_elements):
+    clusters = []
     for i in range(num_of_elements):
-        for j in range(num_of_elements):
-            sum += W[i][j]
-    average = sum/(num_of_elements**2)
-    return average
+        max_i = max(matrix[i])
+        clusters.append(matrix[i].index(max_i))
+    return clusters
 
-def initialize_H(W, num_of_elements, k):
-    average = calculate_average(W, num_of_elements)
-    H = np.random.uniform(low=0.0, high=2*math.sqrt(average/k), size=(num_of_elements, k))
-    return H
 
 def main():
     file_name=""
@@ -136,7 +108,7 @@ def main():
     d = len(elements[0])
 
     if k<1 or k>num_of_elements:
-        print("Invalid number of clusters!")
+        print("An Error Has Occurred")
         exit(0)
 
     kmeans_clusters = kmeans(elements, num_of_elements, k, d)
