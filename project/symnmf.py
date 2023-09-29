@@ -6,6 +6,8 @@ import mysymnmf as mf
 
 np.random.seed(0)
 
+#this function calculates and returns the average of all entries of the normalized matrix W,
+#which has num_of_elements rows and num_of_elements columns.
 def calculate_average(W, num_of_elements):
     sum = 0.0
     for i in range(num_of_elements):
@@ -14,6 +16,10 @@ def calculate_average(W, num_of_elements):
     average = sum/(num_of_elements**2)
     return average
 
+#this function randomly initializes the matrix H for the symNMF algorythm 
+# from the normalized matrix W. k is the number of required clusters.
+# W has num_of_elements rows and num_of_elements columns.
+# the returned matrix has num_of_elements rows and k columns.
 def initialize_H(W, num_of_elements, k):
     average = calculate_average(W, num_of_elements)
     H = np.random.uniform(low=0.0, high=2*math.sqrt(average/k), size=(num_of_elements, k))
@@ -25,7 +31,9 @@ def is_float(n):
         return True
     except:
         return False
-    
+
+#this function prints the elements of the given matrix, which has num_of_rows rows 
+#and num_of_cols columns, separated by commas    
 def printMatrix(matrix, num_of_rows, num_of_cols):
     for i in range(num_of_rows):
         for j in range(num_of_cols):
@@ -56,7 +64,7 @@ def main():
 
     file = pd.read_csv(file_name, header=None)
 
-    elements = file.values
+    elements = file.values #this is the array of the datapoints from the file
 
     num_of_elements=len(elements)
     d=len(elements[0])
@@ -65,6 +73,7 @@ def main():
         print("An Error Has Occurred")
         exit(0)
 
+    #performing the given goal
     if goal=="sym":
         printMatrix(mf.sym(elements.tolist(), num_of_elements, d), num_of_elements, num_of_elements)
     elif goal=="ddg":

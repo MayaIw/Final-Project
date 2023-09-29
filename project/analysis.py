@@ -9,8 +9,8 @@ import mysymnmf as mf
 
 np.random.seed(0)
 
+#the function calculates the euclidean distance between p1 and p2.
 #p1, p2 are arrays with float values, representing d dimentional points
-#the function calculates the euclidean distance between p1 and p2
 def distance(p1, p2, d):
     sum_of_squares = 0.0
     for i in range(d):
@@ -18,6 +18,7 @@ def distance(p1, p2, d):
     distance= math.sqrt(sum_of_squares)
     return distance
 
+#this function returns the index of the centroid closest to x.
 #x is a point in R^d, centroids is an array with k points in R^d
 def clusterAssign(x, centriods, k, d):
    min_distance = distance(x, centriods[0], d)
@@ -29,6 +30,7 @@ def clusterAssign(x, centriods, k, d):
            cluster = i
    return cluster 
 
+#this function calculates the new centroids from the given clusters.
 #clusters is a 2D array of sum of the points in each cluster
 #size of clusters is an array of the size of each cluster
 #k is the number of clusters
@@ -37,12 +39,15 @@ def centriodUpdate(clusters, size_of_clusters, k: int, d: int):
     for i in range(k):
         for j in range(d):
             if size_of_clusters[i]==0:
-                print("error in kmeans")
                 print("An Error Has Occurred")
                 exit(0)
             clusters[i][j] =  clusters[i][j]/size_of_clusters[i]
     return
-    
+
+#this function performs the kmeans algorithm from the datapoints elements.
+#there are num_of_elements d dimentional datapoints, and k required clusters.
+# returns an array with num_of_elements cells, where the i'th cell contains
+# the cluster that the i'th datapoint belongs to.
 def kmeans(elements, num_of_elements, k, d):
     centroids = []
     clusters = [[0.0 for i in range(d)] for j in range(k)] 
@@ -78,7 +83,9 @@ def kmeans(elements, num_of_elements, k, d):
     final_clusters = [clusterAssign(elements[x], centroids, k, d) for x in range(num_of_elements)]
     return final_clusters
 
-    
+#this function returns an array with num_of_elements cells, where the i'th cell contains
+# the cluster that the i'th datapoint belongs to, from the result of symNMF.
+# matrix is the result matrix of symNMF.    
 def symnmfClusterAssign(matrix, num_of_elements):
     clusters = []
     for i in range(num_of_elements):
@@ -94,6 +101,7 @@ def main():
     d=0
     
     if len(sys.argv) == 3:
+
         k = int(sys.argv[1])
         file_name = str(sys.argv[2])
     else:
@@ -102,19 +110,20 @@ def main():
 
     file = pd.read_csv(file_name, header=None)
 
-    elements = file.values
+    elements = file.values #this is the array of the datapoints from the file
 
     num_of_elements=len(elements)
-    print("num of elements is %d" % num_of_elements)
     d = len(elements[0])
 
     if k<1 or k>num_of_elements:
         print("An Error Has Occurred")
         exit(0)
 
+    #calculating the silhouette score of kmeans
     kmeans_clusters = kmeans(elements, num_of_elements, k, d)
     kmeans_silhouette = metrics.silhouette_score(elements, kmeans_clusters)
 
+    #calculating the silhouette score of symNMF
     W = mf.norm(elements.tolist(), num_of_elements, d)
     H = initialize_H(W, num_of_elements, k)
     new_H = mf.symnmf(H.tolist(), W, k, num_of_elements)

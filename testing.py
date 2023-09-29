@@ -1,39 +1,12 @@
-import math
-import sys
+from symnmf import *
+from analysis import *
+import os
+import matplotlib as mpl
+if os.environ.get('DISPLAY','') == '':
+    mpl.use('Agg')
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import mysymnmf as mf
-
-np.random.seed(0)
-
-def calculate_average(W, num_of_elements):
-    sum = 0.0
-    for i in range(num_of_elements):
-        for j in range(num_of_elements):
-            sum += W[i][j]
-    average = sum/(num_of_elements**2)
-    return average
-
-def initialize_H(W, num_of_elements, k):
-    average = calculate_average(W, num_of_elements)
-    H = np.random.uniform(low=0.0, high=2*math.sqrt(average/k), size=(num_of_elements, k))
-    return H
-
-def is_float(n):
-    try:
-        float(n)
-        return True
-    except:
-        return False
-    
-def printMatrix(matrix, num_of_rows, num_of_cols):
-    for i in range(num_of_rows):
-        for j in range(num_of_cols):
-            print('%.4f' % matrix[i][j], end='')
-            if j<num_of_cols-1:
-                print(",", end='')
-        print('')
-    return
 
 def main():
     k=0
@@ -57,6 +30,7 @@ def main():
     file = pd.read_csv(file_name, header=None)
 
     elements = file.values
+    elements = elements[:,0:2]
 
     num_of_elements=len(elements)
     d=len(elements[0])
@@ -74,10 +48,24 @@ def main():
     elif goal=="symnmf":
         W = mf.norm(elements.tolist(), num_of_elements, d)
         H = initialize_H(W, num_of_elements, k)
+        new_H = mf.symnmf(H.tolist(), W, k, num_of_elements)
         printMatrix(mf.symnmf(H.tolist(), W, k, num_of_elements), num_of_elements, k)
     else:
         print("An Error Has Occurred")
         exit(0)
 
+    symnmf_clusters = symnmfClusterAssign(new_H, num_of_elements)
+
+    f = plt.figure(1, figsize=[10,10])
+    x = [d[0] for d in elements]
+    y = [d[1] for d in elements]
+    plt.scatter(x,y, c=symnmf_clusters)
+
+    plt.xticks(np.arange(1, 11, step=1))
+    plt.savefig("elbow.png")
+    plt.show()
+
 if __name__ == "__main__":
     main()
+
+
