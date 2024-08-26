@@ -32,7 +32,7 @@ Reading user CMD arguments: </br>
 (b) file_name (.txt): The path to the Input file, it will contain N data points for all above goals, the file extension is .txt. </br>
 Compile the C program by running the following command: make 
 
-analysis.py
+analysis.py </br>
 Compares SymNMF to Kmeans. Applies both methods to a given dataset and reports the silhouette_score from the sklearn.metrics. </br>
 Reading user CMD arguments: </br>
 (a) k (int, < N): Number of required clusters. </br>
